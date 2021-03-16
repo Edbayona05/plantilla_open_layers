@@ -1,0 +1,245 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <title>Prueba desarrollo web Geoportal</title>
+    <style>
+      html, body, #map {
+        margin: 0;
+        height: 100%;
+        width: 100%;
+        font-family: sans-serif;
+      }
+    </style>
+    <link rel="stylesheet" href="https://geoportal.dane.gov.co/src/styles/geoportalfonts.min.css">
+    <link rel="stylesheet" href="styles.css">
+  </head>
+  <body>
+
+    <div id="contenedor">
+
+      <div class="header">
+        <nav role="navigation">
+          <div id="menuToggle">
+            <!--
+            A fake / hidden checkbox is used as click reciever,
+            so you can use the :checked selector on it.
+            -->
+            <input type="checkbox" id="ham" />
+            
+            <!--
+            Some spans to act as a hamburger.
+            
+            They are acting like a real hamburger,
+            not that McDonalds stuff.
+            -->
+            <span class="men"></span>
+            <span class="men"></span>
+            <span class="men"></span>
+            
+            <!--
+            Too bad the menu has to be inside of the button
+            but hey, it's pure CSS magic.
+            -->
+            <ul id="menu">
+              
+              <div class="ventana">
+  
+                <div class="body">
+                  
+                  
+  
+                  <p class="titulo_seccion"><span class="DANE__Geovisor__icon__note"></span> Acerca</p>
+  
+                  <p id="description"></p>
+  
+                  <p class="titulo_seccion"><span class="DANE__Geovisor__icon__filter"></span> Filtro</p>
+                  <div class="seccion">
+                    <p>Departamento</p>
+                    <select id="departamento">
+                      <option value="">Seleccione...</option>
+                    </select>
+                  </div>
+                  <div class="seccion mun">
+                    <p>Municipio</p>
+                    <select id="municipio">
+                      <option>Seleccione...</option>
+                    </select>
+                  </div>
+                  <div class="seccion mun1">
+                    <p>Clase</p>
+                    <select id="clase">
+                      <option value="0">Todas</option>
+                      <option value="1">1</option>
+                      <option value="2">2</option>
+                      <option value="3">3</option>
+                    </select>
+                  </div>
+            
+                  <p class="titulo_seccion"><span class="DANE__Geovisor__icon__List"></span> Capas</p>
+            
+                  <div class="grupo-capas">
+                    <label>
+                      <input type="checkbox" value="value" class="layer" layer="mpio" id="check5" />
+                      <label for="check5"></label>
+                      <span>Municipio</span>
+                    </label>
+            
+                    <label>
+                      <input type="checkbox" value="value" class="layer" layer="depto" id="check6" />
+                      <label for="check6"></label>
+                      <span>Departamento</span>
+                    </label>
+            
+                  </div>
+  
+  
+                  <p class="titulo_seccion"> <span class="DANE__Geovisor__icon__baseMap"></span> Mapa Base</p>
+            
+                  <div class="grupo-base">
+                    <div class="elemento">
+                      <input type="radio" id="switch" name="radio1" checked value="normal"/>
+                      <label for="switch">
+                        <div class="padre">
+                          <div class="hov"><img src="./img/correct.svg" alt=""></div>
+                          <img src="./img/normal.png" alt="">
+                        </div>
+                      </label>
+                    </div>
+                    <div class="elemento">
+                      <input type="radio" id="switch1" name="radio1"value="gris" />
+                      <label for="switch1">
+                        <div class="padre">
+                          <div class="hov"><img src="./img/correct.svg" alt=""></div>
+                          <img src="./img/gris.png" alt="">
+                        </div>
+                      </label>
+                    </div>
+                    <div class="elemento">
+                      <input type="radio" id="switch2" name="radio1" value="dark"/>
+                      <label for="switch2">
+                        <div class="padre">
+                          <div class="hov"><img src="./img/correct.svg" alt=""></div>
+                          <img src="./img/dark.png" alt="">
+                        </div>
+                      </label>
+                    </div>
+            
+                  </div>
+  
+                 
+  
+  
+                  <p class="titulo_seccion"> <span class="DANE__Geovisor__icon__dataAnalysis"></span> Tabla</p>
+  
+                  <div id="resumen">
+  
+                  
+                  <div id="estadisticas"></div>
+  
+                </div>
+            
+  
+                  
+  
+                 
+            
+  
+                  <img id="logo-presidente" src="" alt="">
+          
+          
+                </div>
+  
+              </div>
+  
+  
+            </ul>
+          </div>
+        </nav>
+        <div class="geoportal">
+          <span class="DANE__Geovisor__icon__DANE__favicon"></span>
+          <span class="DANE__Geovisor__icon__logoGeoportal02"></span>
+        </div>
+        <p id="titulo_visor"></p>
+      </div>
+    </div>
+    <div id="map"></div>
+    <div id="controls" style="margin: 15px;">
+      <button id="addButton">Mostrar Capas</button>
+      <button id="removeButton">Ocular Capas</button>
+      <button id="toggleButton"> Alternar Capas </button>
+    </div>
+    <script src="https://unpkg.com/leaflet@1.6.0/dist/leaflet.js"
+     integrity="sha512-gZwIG9x3wUXg2hdXF6+rVkLF/0Vi9U8D2Ntg4Ga5I5BZpVkVxlJWbSQtXPSiUTtC0TjtGOmxa1AJPuV0CPthew=="
+     crossorigin=""></script>
+    <script>
+        // Create web map object
+        var map = L.map('map',{ center: [-74.0817500, 4.6097100], zoom: 7});
+        // Add tile layer for Open Street Map to map object     
+          //L.tileLayer('http://{s}.tile.osm.org/{z}/{x}/{y}.png').addTo(map);
+          var Municipio= L.WMS.source("https://geoserverportal.dane.gov.co/geoserver2/postgis/wms", {
+                onEachFeature: function (feature, layer) {
+                layer.bindPopup(feature.properties.name);
+                }
+                });
+                document.getElementById("addButton").addEventListener("click", addMunicipio);
+                document.getElementById("removeButton").addEventListener("click", removeMunicipio);
+                document.getElementById("toggleButton").addEventListener("click",toggleMunicipio);
+                // add Municipios function
+                function addMunicipio() {
+                Municipio.addTo(map);
+                };
+                // Remove Municipios function
+                function removeMunicipio() {
+                Municipio.remove(map);
+                };
+                // Toggle Municipios
+                function toggleMunicipio(){
+                if(map.hasLayer(Municipio)){
+                removeMunicipio();
+                } else {
+                addMunicipio();
+                }
+                };
+        var popup = L.popup();
+        function onMapClick(e) {
+                popup
+                .setLatLng(e.latlng)
+                .setContent("You clicked the map at " + e.latlng.toString())
+                .openOn(map);
+                }
+         var basemaps={
+                
+                OpenStreetMap: L.tileLayer('http://{s}.tile.osm.org/{z}/{x}/{y}.png'),
+                Lugares: L.tileLayer('https://stamen-tiles-{s}.a.ssl.fastly.net/watercolor/{z}/{x}/{y}.{ext}', {
+                    attribution: 'Map tiles by <a href="http://stamen.com">Stamen Design</a>, <a href="http://creativecommons.org/licenses/by/3.0">CC BY 3.0</a> &mdash; Map data &copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
+                    subdomains: 'abcd',
+                    minZoom: 1,
+                    maxZoom: 16,
+                    ext: 'jpg'
+                }),
+                 OpenTopoMap : L.tileLayer('https://{s}.tile.opentopomap.org/{z}/{x}/{y}.png', {
+	               maxZoom: 17,
+	               attribution: 'Map data: &copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors, <a href="http://viewfinderpanoramas.org">SRTM</a> | Map style: &copy; <a href="https://opentopomap.org">OpenTopoMap</a> (<a href="https://creativecommons.org/licenses/by-sa/3.0/">CC-BY-SA</a>)'
+                }),
+                CyclOSM: L.tileLayer('https://{s}.tile-cyclosm.openstreetmap.fr/cyclosm/{z}/{x}/{y}.png', {
+                    maxZoom: 20,
+                    attribution: '<a href="https://github.com/cyclosm/cyclosm-cartocss-style/releases" title="CyclOSM - Open Bicycle render">CyclOSM</a> | Map data: &copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+                })
+            
+            };
+        
+        L.control.layers(basemaps,{},{collapsed:false}).addTo(map);
+
+        basemaps.Lugares.addTo(map);
+        
+        map.on('click', onMapClick);
+	</script>
+    
+          <div id="info">&nbsp;</div>
+
+    <script src="./index.js"></script> 
+    
+    
+  </body>
+</html>
